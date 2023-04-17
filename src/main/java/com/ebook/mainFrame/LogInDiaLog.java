@@ -30,6 +30,10 @@ public class LogInDiaLog extends javax.swing.JDialog {
         setIconImage(ShareHelper.APP_ICON);
         MovingForm.initMoving(this, pnlMainLogin);
     }
+    
+    public LogInDiaLog() {
+       
+    }
 
     private boolean checkForm() {
         if (!UtilityHelper.checkNullText(lblTenDangNhap, txtTenDangNhap)) {
@@ -67,7 +71,48 @@ public class LogInDiaLog extends javax.swing.JDialog {
                 }
             }
         }
+        else {
+        	DialogHelper.alert(this, "Trống tên đăng nhập");
+        	
+        	return;
+        }
     }
+    
+    //Hàm test Junit
+	public String testDangNhap(String tenDangNhap, String matKhau) {
+		String notification = "";
+//     String tenDangNhap = txtTenDangNhap.getText();
+		TaiKhoan taikhoan = taiKhoanDao.findById(tenDangNhap);
+		if (taikhoan != null && tenDangNhap.equals(taikhoan.getTenDangNhap())) {
+			if (!taikhoan.isTrangThai()) {
+				notification = "Tài khoản đã bị đừng hoạt động";
+				return notification;
+			} else {
+//             String matKhau = String.valueOf(txtMatKhau.getPassword());
+				if (!matKhau.equals(taikhoan.getMatKhau())) {
+					notification = "Đăng nhập thất bại";
+					return notification;
+				} else {
+					if (taikhoan.isVaiTro()) {
+						notification = "Đăng nhập quyền quản trị thành công";
+						this.dispose();
+						ShareHelper.USER = taikhoan;
+						return notification;
+					} else {
+						notification = "Đăng nhập thành công";
+						this.dispose();
+						ShareHelper.USER = taikhoan;
+						return notification;
+					}
+				}
+			}
+		} else {
+			notification = "Trống tên đăng nhập";
+
+			return notification;
+		}
+		
+	}
 
     /**
      * This method is called from within the constructor to initialize the form.
