@@ -4,8 +4,18 @@
  */
 package com.ebook.mainFrame;
 
+import com.ebooks.dao.TheLoaiDAO;
+import com.ebooks.dao.TheLoai_SachDAO;
+import com.ebooks.helper.DialogHelper;
 import com.ebooks.helper.MovingForm;
+import com.ebooks.helper.ShareHelper;
+import com.ebooks.model.TheLoai;
 import java.awt.Color;
+import java.awt.event.KeyEvent;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.List;
+import javax.swing.table.DefaultTableModel;
 
 /**
  *
@@ -16,11 +26,34 @@ public class ListTypeBookDiaLog extends javax.swing.JDialog {
     /**
      * Creates new form ListTypeBookDiaLog
      */
+    private List<TheLoai> ListTL = new ArrayList<TheLoai>();
+    private TheLoaiDAO DAOTL = new TheLoaiDAO();
+
     public ListTypeBookDiaLog(java.awt.Dialog parent, boolean modal) {
         super(parent, modal);
         initComponents();
         setBackground(new Color(0, 0, 0, 0));
-         MovingForm.initMoving(this,pnlDanhSachTheLoai);
+        MovingForm.initMoving(this, pnlDanhSachTheLoai);
+        fillTableTypeBook();
+    }
+
+    private void fillTableTypeBook() {
+        List<TheLoai> ListTL = new ArrayList<TheLoai>();
+        TheLoaiDAO DAOTL = new TheLoaiDAO();
+        DefaultTableModel model;
+        model = (DefaultTableModel) tblTheLoai.getModel();
+        tblTheLoai.setSelectionBackground(new Color(87, 190, 110));
+        model.setRowCount(0);
+        try {
+            ListTL = DAOTL.selectNotBook(AddTypeAndAuthorDiaLog.sachSeletion.getMaSach(), txtTimTheLoai.getText());
+            for (TheLoai theLoai : ListTL) {
+                Object[] row = {theLoai.getMaTheLoai(), theLoai.getTenTheLoai(), ShareHelper.formats.format(theLoai.getNgayTao()), theLoai.getTenDangNhap(), theLoai.getMoTaTheLoai()};
+                model.addRow(row);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            DialogHelper.alert(this, "Lỗi truy vấn dữ liệu");
+        }
     }
 
     /**
@@ -36,10 +69,10 @@ public class ListTypeBookDiaLog extends javax.swing.JDialog {
         pnlExit1 = new com.ebooks.Compoment.PanelRound();
         lblExit1 = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
-        table1 = new com.ebooks.Compoment.Table();
+        tblTheLoai = new com.ebooks.Compoment.Table();
         jLabel19 = new javax.swing.JLabel();
         panelRound4 = new com.ebooks.Compoment.PanelRound();
-        txtTimTacGia = new com.ebooks.Compoment.SearchText();
+        txtTimTheLoai = new com.ebooks.Compoment.SearchText();
         btnTimTacGia = new com.ebooks.Compoment.MyButton();
         btnLuuThongTin = new com.ebooks.Compoment.MyButton();
 
@@ -66,9 +99,6 @@ public class ListTypeBookDiaLog extends javax.swing.JDialog {
             public void mouseExited(java.awt.event.MouseEvent evt) {
                 pnlExit1MouseExited(evt);
             }
-            public void mousePressed(java.awt.event.MouseEvent evt) {
-                pnlExit1MousePressed(evt);
-            }
         });
         pnlExit1.setLayout(new java.awt.GridBagLayout());
 
@@ -79,26 +109,36 @@ public class ListTypeBookDiaLog extends javax.swing.JDialog {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 lblExit1MouseClicked(evt);
             }
-            public void mousePressed(java.awt.event.MouseEvent evt) {
-                lblExit1MousePressed(evt);
-            }
         });
         pnlExit1.add(lblExit1, new java.awt.GridBagConstraints());
 
         pnlDanhSachTheLoai.add(pnlExit1, new org.netbeans.lib.awtextra.AbsoluteConstraints(680, 0, 50, 50));
 
-        table1.setModel(new javax.swing.table.DefaultTableModel(
+        tblTheLoai.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null}
+                {null, null, null, null, null},
+                {null, null, null, null, null},
+                {null, null, null, null, null},
+                {null, null, null, null, null}
             },
             new String [] {
-                "Title 1", "Title 2", "Title 3", "Title 4"
+                "Mã thể loại", "Tên thể loại", "Ngày tạo", "Người tạo", "Mô tả"
             }
-        ));
-        jScrollPane1.setViewportView(table1);
+        ) {
+            boolean[] canEdit = new boolean [] {
+                false, false, false, false, false
+            };
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        });
+        tblTheLoai.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                tblTheLoaiMouseClicked(evt);
+            }
+        });
+        jScrollPane1.setViewportView(tblTheLoai);
 
         pnlDanhSachTheLoai.add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 130, 690, 280));
 
@@ -114,11 +154,15 @@ public class ListTypeBookDiaLog extends javax.swing.JDialog {
         panelRound4.setRoundTopRight(10);
         panelRound4.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
-        txtTimTacGia.setBackground(new java.awt.Color(232, 244, 234));
-        txtTimTacGia.setForeground(new java.awt.Color(51, 51, 51));
-        txtTimTacGia.setText("Tìm kiếm thể loại ");
-        txtTimTacGia.setFont(new java.awt.Font("Inter Medium", 0, 12)); // NOI18N
-        panelRound4.add(txtTimTacGia, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 0, 630, 40));
+        txtTimTheLoai.setBackground(new java.awt.Color(232, 244, 234));
+        txtTimTheLoai.setForeground(new java.awt.Color(51, 51, 51));
+        txtTimTheLoai.setFont(new java.awt.Font("Inter Medium", 0, 12)); // NOI18N
+        txtTimTheLoai.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                txtTimTheLoaiKeyPressed(evt);
+            }
+        });
+        panelRound4.add(txtTimTheLoai, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 0, 630, 40));
 
         btnTimTacGia.setBackground(new java.awt.Color(232, 244, 234));
         btnTimTacGia.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/ebooks/Icon/search (1).png"))); // NOI18N
@@ -172,38 +216,57 @@ public class ListTypeBookDiaLog extends javax.swing.JDialog {
     }// </editor-fold>//GEN-END:initComponents
 
     private void lblExit1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lblExit1MouseClicked
-        // TODO add your handling code here:
+        this.dispose();
     }//GEN-LAST:event_lblExit1MouseClicked
 
-    private void lblExit1MousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lblExit1MousePressed
-        // TODO add your handling code here:
-        this.dispose();
-    }//GEN-LAST:event_lblExit1MousePressed
-
     private void pnlExit1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_pnlExit1MouseClicked
-        // TODO add your handling code here:
+        this.dispose();
     }//GEN-LAST:event_pnlExit1MouseClicked
 
-    private void pnlExit1MouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_pnlExit1MouseEntered
-        // TODO add your handling code here:
-    }//GEN-LAST:event_pnlExit1MouseEntered
-
-    private void pnlExit1MouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_pnlExit1MouseExited
-        // TODO add your handling code here:
-    }//GEN-LAST:event_pnlExit1MouseExited
-
-    private void pnlExit1MousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_pnlExit1MousePressed
-        // TODO add your handling code here:
-        this.dispose();
-    }//GEN-LAST:event_pnlExit1MousePressed
-
     private void btnTimTacGiaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnTimTacGiaActionPerformed
-        // TODO add your handling code here:
+        fillTableTypeBook();
     }//GEN-LAST:event_btnTimTacGiaActionPerformed
 
     private void btnLuuThongTinActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLuuThongTinActionPerformed
-       
+        int index = tblTheLoai.getSelectedRow();
+        if (index != -1) {
+            String maTheLoai = String.valueOf(tblTheLoai.getValueAt(index, 0));
+            TheLoai theLoai = DAOTL.findById(maTheLoai);
+            if (theLoai != null) {
+                AddTypeAndAuthorDiaLog.theLoaiSeletion = theLoai;
+                DialogHelper.alert(this, "Đã xác nhận chọn thể loại này");
+                this.dispose();
+            }
+        }else {
+            DialogHelper.alert(this, "Hãy chọn thể loại !");
+        }
     }//GEN-LAST:event_btnLuuThongTinActionPerformed
+
+    private void tblTheLoaiMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblTheLoaiMouseClicked
+        if (evt.getClickCount() == 2) {
+            int index = tblTheLoai.getSelectedRow();
+            String maTheLoai = String.valueOf(tblTheLoai.getValueAt(index, 0));
+            TheLoai theLoai = DAOTL.findById(maTheLoai);
+            if (theLoai != null) {
+                AddTypeAndAuthorDiaLog.theLoaiSeletion = theLoai;
+                this.dispose();
+            }
+        }
+    }//GEN-LAST:event_tblTheLoaiMouseClicked
+
+    private void pnlExit1MouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_pnlExit1MouseEntered
+        pnlExit1.setBackground(new Color(255, 102, 102));
+    }//GEN-LAST:event_pnlExit1MouseEntered
+
+    private void pnlExit1MouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_pnlExit1MouseExited
+        pnlExit1.setBackground(new Color(253, 127, 127));
+    }//GEN-LAST:event_pnlExit1MouseExited
+
+    private void txtTimTheLoaiKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtTimTheLoaiKeyPressed
+        if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
+            fillTableTypeBook();
+        }
+    }//GEN-LAST:event_txtTimTheLoaiKeyPressed
 
     /**
      * @param args the command line arguments
@@ -256,7 +319,7 @@ public class ListTypeBookDiaLog extends javax.swing.JDialog {
     private com.ebooks.Compoment.PanelRound panelRound4;
     private com.ebooks.Compoment.PanelRound pnlDanhSachTheLoai;
     private com.ebooks.Compoment.PanelRound pnlExit1;
-    private com.ebooks.Compoment.Table table1;
-    private com.ebooks.Compoment.SearchText txtTimTacGia;
+    private com.ebooks.Compoment.Table tblTheLoai;
+    private com.ebooks.Compoment.SearchText txtTimTheLoai;
     // End of variables declaration//GEN-END:variables
 }

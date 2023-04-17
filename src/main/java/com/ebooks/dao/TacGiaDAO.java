@@ -100,6 +100,12 @@ public class TacGiaDAO {
         return select(sql);
     }
     
+    public List<TacGia> selectNotBook (String maSach,String keyWord) {
+        String sql="select * from TacGia where maTacGia not in (Select maTacGia from TacGia_Sach where maSach=?) AND hoTen  like  ?";
+        List<TacGia> list = select(sql, maSach, "%"+keyWord+"%");
+        return list;
+    }
+    
     /**
      * Truy vấn thực thể theo mã id
      * @param id là mã của bản ghi được truy vấn

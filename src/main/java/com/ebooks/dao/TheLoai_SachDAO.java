@@ -76,6 +76,11 @@ public class TheLoai_SachDAO {
         );
     }
     
+     public void deleteSach(String id) {
+        String sql = "DELETE FROM TheLoai_Sach WHERE maSach=?";
+          JdbcHelper.executeUpdate(sql, id);
+    }
+    
     
      public void deleteTL(String id) {
         String sql = "DELETE FROM TheLoai_Sach WHERE maTheLoai=?";
@@ -91,6 +96,12 @@ public class TheLoai_SachDAO {
     public List<TheLoai_Sach> selectAll() {
         String sql = "SELECT * FROM TheLoai_Sach";
         return select(sql);
+    }
+    
+    public List<TheLoai_Sach> selectAllBook(String id) {
+        String sql = "SELECT * FROM TheLoai_Sach where maSach=?";
+        List<TheLoai_Sach> list = select(sql, id);
+        return list;
     }
 
     /**

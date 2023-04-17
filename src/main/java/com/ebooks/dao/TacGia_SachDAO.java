@@ -7,6 +7,7 @@ package com.ebooks.dao;
 import com.ebooks.helper.JdbcHelper;
 import com.ebooks.model.SachYeuThich;
 import com.ebooks.model.TacGia_Sach;
+import com.ebooks.model.TheLoai_Sach;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -81,6 +82,12 @@ public class TacGia_SachDAO {
         String sql = "DELETE FROM TacGia_Sach WHERE maTacGia=?";
         JdbcHelper.executeUpdate(sql, id);
     }
+    
+    
+    public void deleteSach(String id) {
+        String sql = "DELETE FROM TacGia_Sach WHERE maSach=?";
+        JdbcHelper.executeUpdate(sql, id);
+    }
 
     /**
      * Truy vấn tất cả các các thực thể
@@ -91,6 +98,12 @@ public class TacGia_SachDAO {
     public List<TacGia_Sach> selectAll() {
         String sql = "SELECT * FROM TacGia_Sach";
         return select(sql);
+    }
+    
+     public List<TacGia_Sach> selectAllBook(String id) {
+        String sql = "SELECT * FROM TacGia_Sach where maSach=?";
+        List<TacGia_Sach> list = select(sql, id);
+        return list;
     }
 
     /**

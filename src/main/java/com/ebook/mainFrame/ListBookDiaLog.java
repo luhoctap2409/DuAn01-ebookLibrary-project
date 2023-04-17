@@ -228,11 +228,15 @@ public class ListBookDiaLog extends javax.swing.JDialog {
 
     private void btnLuuThongTinActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLuuThongTinActionPerformed
         int index = tblSach.getSelectedRow();
-        String maSach = tblSach.getValueAt(index, 0).toString();
-        Sach sach = DAOS.findById(maSach);
-        if (sach != null) {
-            AddTypeAndAuthorDiaLog.sachSeletion = sach;
-            this.dispose();
+        if (index != 1) {
+            String maSach = tblSach.getValueAt(index, 0).toString();
+            Sach sach = DAOS.findById(maSach);
+            if (sach != null) {
+                AddTypeAndAuthorDiaLog.sachSeletion = sach;
+                this.dispose();
+            }
+        } else {
+            DialogHelper.alert(this, "Hãy chọn sách !");
         }
     }//GEN-LAST:event_btnLuuThongTinActionPerformed
 
@@ -245,12 +249,16 @@ public class ListBookDiaLog extends javax.swing.JDialog {
     private void tblSachMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblSachMouseClicked
         if (evt.getClickCount() == 2) {
             int index = tblSach.getSelectedRow();
-            String maSach = tblSach.getValueAt(index, 0).toString();
-            Sach sach = DAOS.findById(maSach);
-            boolean result = DialogHelper.confirm(this, "Xác nhận đã chọn");
-            if (sach != null && result) {
-                AddTypeAndAuthorDiaLog.sachSeletion = sach;
-                this.dispose();
+            if (index != -1) {
+                String maSach = tblSach.getValueAt(index, 0).toString();
+                Sach sach = DAOS.findById(maSach);
+                boolean result = DialogHelper.confirm(this, "Xác nhận đã chọn");
+                if (sach != null && result) {
+                    AddTypeAndAuthorDiaLog.sachSeletion = sach;
+                    this.dispose();
+                }
+            } else {
+                DialogHelper.alert(this, "Hãy chọn sách !");
             }
         }
     }//GEN-LAST:event_tblSachMouseClicked

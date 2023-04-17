@@ -133,10 +133,10 @@ public class AuthorDiaLog extends javax.swing.JDialog {
         return true;
     }
 
-    public String SetImg() {
+    private void SetImg() {
         JFileChooser fileChooser = new JFileChooser();
         int x = fileChooser.showDialog(this, "Chon file");
-        if (x == JFileChooser.APPROVE_OPTION) {
+        if (x == JFileChooser.APPROVE_OPTION && !fileChooser.getSelectedFile().equals(null)) {
             try {
                 FileInputStream in = new FileInputStream(fileChooser.getSelectedFile().getPath());
                 FileOutputStream ou = new FileOutputStream("..\\DuAn01-ebookLibrary-project\\src\\main\\java\\com\\ebooks\\imgAthor\\" + fileChooser.getSelectedFile().getName());
@@ -155,7 +155,7 @@ public class AuthorDiaLog extends javax.swing.JDialog {
                 e.printStackTrace();
             }
         }
-        return fileChooser.getSelectedFile().getName();
+        return;
     }
 
     private void createTacGia() {
@@ -253,7 +253,6 @@ public class AuthorDiaLog extends javax.swing.JDialog {
         btnThemMoi = new com.ebooks.Compoment.MyButton();
         pnlExit1 = new com.ebooks.Compoment.PanelRound();
         lblExit1 = new javax.swing.JLabel();
-        jButton1 = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setUndecorated(true);
@@ -564,14 +563,6 @@ public class AuthorDiaLog extends javax.swing.JDialog {
 
         panelRound1.add(pnlExit1, new org.netbeans.lib.awtextra.AbsoluteConstraints(860, 0, 50, 50));
 
-        jButton1.setText("jButton1");
-        jButton1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton1ActionPerformed(evt);
-            }
-        });
-        panelRound1.add(jButton1, new org.netbeans.lib.awtextra.AbsoluteConstraints(420, 50, -1, -1));
-
         getContentPane().add(panelRound1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 910, 550));
 
         pack();
@@ -660,10 +651,6 @@ public class AuthorDiaLog extends javax.swing.JDialog {
         }
     }//GEN-LAST:event_btnThemMoiActionPerformed
 
-    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        System.exit(0);
-    }//GEN-LAST:event_jButton1ActionPerformed
-
     private void lblExit1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lblExit1MouseClicked
         this.dispose();
     }//GEN-LAST:event_lblExit1MouseClicked
@@ -743,7 +730,6 @@ public class AuthorDiaLog extends javax.swing.JDialog {
     private com.ebooks.Compoment.MyButton btnTimTacGia;
     private com.ebooks.Compoment.MyButton btnXoaTG;
     private javax.swing.ButtonGroup buttonGroup1;
-    private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;

@@ -50,8 +50,11 @@ public class mainFrame extends javax.swing.JFrame {
             mnQuanLySach.setVisible(false);
             mnQuanLyTaiKhoan.setVisible(false);
         } else {
-            lblBanMuonSach.setVisible(false);
-            tblBangMuonSach.setVisible(false);
+           mnDocSach.setVisible(false);
+           btnSearch.setVisible(false);
+           lblBanMuonSach.setVisible(false);
+           tblBangMuonSach.setVisible(false);
+         
         }
     }
 
@@ -86,7 +89,6 @@ public class mainFrame extends javax.swing.JFrame {
         lblAvata = new com.ebooks.Compoment.ImageAvatar();
         btnSearch = new com.ebooks.Compoment.MyButton();
         lblLogo = new com.ebooks.Compoment.LabelBoder();
-        lblTime1 = new javax.swing.JLabel();
         btnTurnOff = new com.ebooks.Compoment.MyButton();
         panelRadius4 = new com.ebooks.Compoment.PanelRadius();
         jLabel34 = new javax.swing.JLabel();
@@ -97,7 +99,7 @@ public class mainFrame extends javax.swing.JFrame {
         jScrollPane2 = new javax.swing.JScrollPane();
         tblBangMuonSach = new com.ebooks.Compoment.Table();
         panelRound1 = new com.ebooks.Compoment.PanelRound();
-        lblTime = new javax.swing.JLabel();
+        lblDate = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
         jMenuBar1 = new javax.swing.JMenuBar();
         mnCaiDat = new javax.swing.JMenu();
@@ -174,10 +176,6 @@ public class mainFrame extends javax.swing.JFrame {
         lblLogo.setRadius(20);
         pnlHeader.add(lblLogo, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 15, -1, 50));
 
-        lblTime1.setFont(new java.awt.Font("Inter Medium", 0, 18)); // NOI18N
-        lblTime1.setText("22 : 30 CH");
-        pnlHeader.add(lblTime1, new org.netbeans.lib.awtextra.AbsoluteConstraints(790, 30, -1, -1));
-
         btnTurnOff.setBackground(new java.awt.Color(149, 219, 170));
         btnTurnOff.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/ebooks/Icon/power.png"))); // NOI18N
         btnTurnOff.setBoderColor(new java.awt.Color(205, 239, 215));
@@ -245,9 +243,9 @@ public class mainFrame extends javax.swing.JFrame {
         panelRound1.setRoundBottomRight(20);
         panelRound1.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
-        lblTime.setFont(new java.awt.Font("Inter Medium", 0, 14)); // NOI18N
-        lblTime.setText("sat 17/03/2023");
-        panelRound1.add(lblTime, new org.netbeans.lib.awtextra.AbsoluteConstraints(1000, 10, -1, -1));
+        lblDate.setFont(new java.awt.Font("Inter Medium", 0, 14)); // NOI18N
+        lblDate.setText("sat 17/03/2023 7:52 PM");
+        panelRound1.add(lblDate, new org.netbeans.lib.awtextra.AbsoluteConstraints(940, 10, -1, -1));
 
         jLabel2.setFont(new java.awt.Font("Inter Medium", 0, 14)); // NOI18N
         jLabel2.setText("Hệ thống quản lý thư viện online");
@@ -515,9 +513,8 @@ public class mainFrame extends javax.swing.JFrame {
     private javax.swing.JSeparator jSeparator5;
     private com.ebooks.Compoment.ImageAvatar lblAvata;
     private javax.swing.JLabel lblBanMuonSach;
+    private javax.swing.JLabel lblDate;
     private com.ebooks.Compoment.LabelBoder lblLogo;
-    private javax.swing.JLabel lblTime;
-    private javax.swing.JLabel lblTime1;
     private javax.swing.JMenu mnCaiDat;
     private javax.swing.JMenu mnDocSach;
     private javax.swing.JMenu mnMuonSach;

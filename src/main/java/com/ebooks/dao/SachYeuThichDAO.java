@@ -69,6 +69,12 @@ public class SachYeuThichDAO {
                entity.getTenDangNhap()
         );
     }
+    
+    
+     public void deleteSach(String id) {
+        String sql = "DELETE FROM SachYeuThich WHERE maSach=?";
+        JdbcHelper.executeUpdate(sql,id);
+    }
 
     /**
      * Truy vấn tất cả các các thực thể

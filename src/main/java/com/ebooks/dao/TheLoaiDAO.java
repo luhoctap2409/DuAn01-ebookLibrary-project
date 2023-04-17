@@ -7,6 +7,7 @@ package com.ebooks.dao;
 import com.ebooks.helper.JdbcHelper;
 import com.ebooks.model.NhaXuatBan;
 import com.ebooks.model.TheLoai;
+import com.ebooks.model.TheLoai_Sach;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -99,6 +100,14 @@ public class TheLoaiDAO {
         String sql="SELECT * FROM TheLoai where not like ''";
         return select(sql);
     }
+     
+     
+    public List<TheLoai> selectNotBook (String maSach,String keyWord) {
+        String sql="select * from TheLoai where maTheLoai not in (Select maTheLoai from TheLoai_Sach where maSach=?) AND tenTheLoai  like  ?";
+        List<TheLoai> list = select(sql, maSach, "%"+keyWord+"%");
+        return list;
+    }
+     
     
     /**
      * Truy vấn thực thể theo mã id

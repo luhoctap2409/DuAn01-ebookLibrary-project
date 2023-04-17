@@ -80,6 +80,12 @@ public class MuonSachChiTietDAO {
         String sql = "DELETE FROM MuonSachChiTiet WHERE maMuonSachChiTiet=?";
         JdbcHelper.executeUpdate(sql, id);
     }
+    
+    
+    public void deleteSach(String id) {
+        String sql = "DELETE FROM MuonSachChiTiet WHERE maSach=?";
+        JdbcHelper.executeUpdate(sql, id);
+    }
 
     /**
      * Truy vấn tất cả các các thực thể

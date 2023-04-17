@@ -4,14 +4,25 @@
  */
 package com.ebook.mainFrame;
 
+import com.ebooks.dao.TacGiaDAO;
+import com.ebooks.dao.TacGia_SachDAO;
+import com.ebooks.dao.TheLoaiDAO;
+import com.ebooks.dao.TheLoai_SachDAO;
+import com.ebooks.helper.DialogHelper;
 import com.ebooks.helper.MovingForm;
+import com.ebooks.helper.ShareHelper;
 import com.ebooks.model.Sach;
 import com.ebooks.model.TacGia;
+import com.ebooks.model.TacGia_Sach;
 import com.ebooks.model.TheLoai;
+import com.ebooks.model.TheLoai_Sach;
 import java.awt.Color;
 import java.awt.Image;
 import java.awt.event.KeyEvent;
+import java.util.ArrayList;
+import java.util.List;
 import javax.swing.ImageIcon;
+import javax.swing.table.DefaultTableModel;
 
 /**
  *
@@ -19,11 +30,12 @@ import javax.swing.ImageIcon;
  */
 public class AddTypeAndAuthorDiaLog extends javax.swing.JDialog {
 
-    static Sach sachSeletion = new Sach();
-    static TheLoai theLoaiSeletion = new TheLoai();
-    static TacGia tacGiaSeletion = new TacGia();
-    private String UrlImg = "..\\DuAn01-ebookLibrary-project\\src\\main\\java\\com\\ebooks\\imgEbooks\\";
+    static public Sach sachSeletion = new Sach();
+    static public TheLoai theLoaiSeletion = new TheLoai();
+    static public TacGia tacGiaSeletion = new TacGia();
 
+    private TheLoai_SachDAO DAOTL_S = new TheLoai_SachDAO();
+    private TacGia_SachDAO DAOTG_S = new TacGia_SachDAO();
     public AddTypeAndAuthorDiaLog(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         initComponents();
@@ -31,7 +43,7 @@ public class AddTypeAndAuthorDiaLog extends javax.swing.JDialog {
         setBackground(new Color(0, 0, 0, 0));
     }
 
-    public void setFormSach(Sach sach) {
+    private void setFormSach(Sach sach) {
         txtMaSach.setText(sach.getMaSach());
         txtDuongDan.setText(sach.getDuongDan());
         txtNhaXuatBan.setText(sach.getMaNXB());
@@ -39,12 +51,61 @@ public class AddTypeAndAuthorDiaLog extends javax.swing.JDialog {
         lblSachImg.setIcon(ShowImg(sach.getBiaTruoc()));
     }
 
-    public ImageIcon ShowImg(String nameImg) {
-        ImageIcon imgIcon = new ImageIcon(UrlImg + nameImg);
+    private ImageIcon ShowImg(String nameImg) {
+        ImageIcon imgIcon = new ImageIcon("..\\DuAn01-ebookLibrary-project\\src\\main\\java\\com\\ebooks\\imgEbooks\\" + nameImg);
         Image image = imgIcon.getImage();
         Image newimg = image.getScaledInstance(160, 160, java.awt.Image.SCALE_SMOOTH);
         imgIcon = new ImageIcon(newimg);
         return imgIcon;
+    }
+
+    private String ConventTypeBook(String maTheLoai) {
+        TheLoaiDAO DAOTL = new TheLoaiDAO();
+        TheLoai theLoai = DAOTL.findById(maTheLoai);
+        return theLoai.getTenTheLoai();
+    }
+    
+    private String ConventAuthorBook(String maTacGia) {
+        TacGiaDAO DAOTG = new TacGiaDAO();
+        TacGia tacGia = DAOTG.findById(maTacGia);
+        return tacGia.getHoTen();
+    }
+
+//------------------------------------LẤY DƯ LIỆU VÀ HIỂN THI------------------------------------//
+    private void fillTableTypeAndBook() {
+        List<TheLoai_Sach> ListTL_S = new ArrayList<TheLoai_Sach>();
+        DefaultTableModel model;
+        model = (DefaultTableModel) tblTheLoai.getModel();
+        tblTheLoai.setSelectionBackground(new Color(87, 190, 110));
+        model.setRowCount(0);
+        try {
+            ListTL_S = DAOTL_S.selectAllBook(txtMaSach.getText());
+            for (TheLoai_Sach loai_Sach : ListTL_S) {
+                Object[] row = {loai_Sach.getMaTheLoai(), loai_Sach.getMaSach(), ConventTypeBook(loai_Sach.getMaTheLoai())};
+                model.addRow(row);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            DialogHelper.alert(this, "Lỗi truy vấn dữ liệu");
+        }
+    }
+
+    private void fillTableAuthorAndBook() {
+        List<TacGia_Sach> ListTG_S = new ArrayList<TacGia_Sach>();
+        DefaultTableModel model;
+        model = (DefaultTableModel) tblTacGia.getModel();
+        tblTacGia.setSelectionBackground(new Color(87, 190, 110));
+        model.setRowCount(0);
+        try {
+            ListTG_S = DAOTG_S.selectAllBook(txtMaSach.getText());
+            for (TacGia_Sach tacGia_Sach : ListTG_S) {
+                Object[] row = {tacGia_Sach.getMaTacGia(),tacGia_Sach.getMaSach(),ConventAuthorBook(tacGia_Sach.getMaTacGia())};
+                model.addRow(row);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            DialogHelper.alert(this, "Lỗi truy vấn dữ liệu");
+        }
     }
 
     /**
@@ -58,8 +119,6 @@ public class AddTypeAndAuthorDiaLog extends javax.swing.JDialog {
 
         pnlTypeAndAuthor = new com.ebooks.Compoment.PanelRound();
         jLabel5 = new javax.swing.JLabel();
-        pnlExit1 = new com.ebooks.Compoment.PanelRound();
-        lblExit1 = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
         pnlAddInfo = new com.ebooks.Compoment.PanelRound();
         txtMaSach = new javax.swing.JTextField();
@@ -83,6 +142,9 @@ public class AddTypeAndAuthorDiaLog extends javax.swing.JDialog {
         btnHuyBoTacGia = new com.ebooks.Compoment.MyButton();
         jPanel1 = new javax.swing.JPanel();
         txtTenSach = new javax.swing.JTextField();
+        jButton1 = new javax.swing.JButton();
+        pnlExit2 = new com.ebooks.Compoment.PanelRound();
+        lblExit2 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setUndecorated(true);
@@ -98,74 +160,21 @@ public class AddTypeAndAuthorDiaLog extends javax.swing.JDialog {
         jLabel5.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/ebooks/Image/nerds-removebg-preview.png"))); // NOI18N
         pnlTypeAndAuthor.add(jLabel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 10, -1, -1));
 
-        pnlExit1.setBackground(new java.awt.Color(253, 127, 127));
-        pnlExit1.setRoundBottomLeft(20);
-        pnlExit1.setRoundTopRight(20);
-        pnlExit1.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                pnlExit1MouseClicked(evt);
-            }
-            public void mouseEntered(java.awt.event.MouseEvent evt) {
-                pnlExit1MouseEntered(evt);
-            }
-            public void mouseExited(java.awt.event.MouseEvent evt) {
-                pnlExit1MouseExited(evt);
-            }
-            public void mousePressed(java.awt.event.MouseEvent evt) {
-                pnlExit1MousePressed(evt);
-            }
-        });
-        pnlExit1.setLayout(new java.awt.GridBagLayout());
-
-        lblExit1.setFont(new java.awt.Font("Inter", 1, 14)); // NOI18N
-        lblExit1.setForeground(new java.awt.Color(255, 255, 255));
-        lblExit1.setText("X");
-        lblExit1.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                lblExit1MouseClicked(evt);
-            }
-            public void mousePressed(java.awt.event.MouseEvent evt) {
-                lblExit1MousePressed(evt);
-            }
-        });
-        pnlExit1.add(lblExit1, new java.awt.GridBagConstraints());
-
-        pnlTypeAndAuthor.add(pnlExit1, new org.netbeans.lib.awtextra.AbsoluteConstraints(860, 0, 50, 50));
-
         jScrollPane1.setBorder(null);
 
         pnlAddInfo.setBackground(new java.awt.Color(249, 249, 249));
         pnlAddInfo.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
+        txtMaSach.setEditable(false);
         txtMaSach.setBackground(new java.awt.Color(222, 247, 227));
-        txtMaSach.addKeyListener(new java.awt.event.KeyAdapter() {
-            public void keyPressed(java.awt.event.KeyEvent evt) {
-                txtMaSachKeyPressed(evt);
-            }
-        });
         pnlAddInfo.add(txtMaSach, new org.netbeans.lib.awtextra.AbsoluteConstraints(270, 50, 260, 40));
 
+        txtNhaXuatBan.setEditable(false);
         txtNhaXuatBan.setBackground(new java.awt.Color(222, 247, 227));
-        txtNhaXuatBan.addKeyListener(new java.awt.event.KeyAdapter() {
-            public void keyPressed(java.awt.event.KeyEvent evt) {
-                txtNhaXuatBanKeyPressed(evt);
-            }
-        });
         pnlAddInfo.add(txtNhaXuatBan, new org.netbeans.lib.awtextra.AbsoluteConstraints(590, 150, 260, 40));
 
         lblSachImg.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/ebooks/Image/stock-photo-76398531.jpg"))); // NOI18N
         lblSachImg.setRadius(20);
-        lblSachImg.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseEntered(java.awt.event.MouseEvent evt) {
-                lblSachImgMouseEntered(evt);
-            }
-            public void mouseExited(java.awt.event.MouseEvent evt) {
-                lblSachImgMouseExited(evt);
-            }
-            public void mousePressed(java.awt.event.MouseEvent evt) {
-                lblSachImgMousePressed(evt);
-            }
-        });
         pnlAddInfo.add(lblSachImg, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 20, 200, 200));
 
         lblMaSach.setFont(new java.awt.Font("Inter Medium", 0, 14)); // NOI18N
@@ -189,6 +198,7 @@ public class AddTypeAndAuthorDiaLog extends javax.swing.JDialog {
         });
         pnlAddInfo.add(btnChonSach, new org.netbeans.lib.awtextra.AbsoluteConstraints(650, 220, 200, 40));
 
+        txtDuongDan.setEditable(false);
         txtDuongDan.setBackground(new java.awt.Color(222, 247, 227));
         pnlAddInfo.add(txtDuongDan, new org.netbeans.lib.awtextra.AbsoluteConstraints(270, 150, 260, 40));
 
@@ -202,16 +212,34 @@ public class AddTypeAndAuthorDiaLog extends javax.swing.JDialog {
 
         tblTheLoai.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null}
+                {null, null, null},
+                {null, null, null},
+                {null, null, null},
+                {null, null, null}
             },
             new String [] {
-                "Title 1", "Title 2", "Title 3", "Title 4"
+                "Mã thể loại", "Mã sách", "Tên thể loại"
             }
-        ));
+        ) {
+            boolean[] canEdit = new boolean [] {
+                false, false, false
+            };
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        });
         tblTheLoai.setSelectionBackground(new java.awt.Color(87, 190, 110));
+        tblTheLoai.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                tblTheLoaiMouseClicked(evt);
+            }
+        });
+        tblTheLoai.addPropertyChangeListener(new java.beans.PropertyChangeListener() {
+            public void propertyChange(java.beans.PropertyChangeEvent evt) {
+                tblTheLoaiPropertyChange(evt);
+            }
+        });
         jScrollPane2.setViewportView(tblTheLoai);
 
         pnlAddInfo.add(jScrollPane2, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 310, 390, 190));
@@ -222,16 +250,34 @@ public class AddTypeAndAuthorDiaLog extends javax.swing.JDialog {
 
         tblTacGia.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null}
+                {null, null, null},
+                {null, null, null},
+                {null, null, null},
+                {null, null, null}
             },
             new String [] {
-                "Title 1", "Title 2", "Title 3", "Title 4"
+                "Mã tác giả", "Mã sách", "Tên tác giả"
             }
-        ));
+        ) {
+            boolean[] canEdit = new boolean [] {
+                false, false, false
+            };
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        });
         tblTacGia.setSelectionBackground(new java.awt.Color(87, 190, 110));
+        tblTacGia.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                tblTacGiaMouseClicked(evt);
+            }
+        });
+        tblTacGia.addPropertyChangeListener(new java.beans.PropertyChangeListener() {
+            public void propertyChange(java.beans.PropertyChangeEvent evt) {
+                tblTacGiaPropertyChange(evt);
+            }
+        });
         jScrollPane3.setViewportView(tblTacGia);
 
         pnlAddInfo.add(jScrollPane3, new org.netbeans.lib.awtextra.AbsoluteConstraints(460, 310, 390, 190));
@@ -245,6 +291,7 @@ public class AddTypeAndAuthorDiaLog extends javax.swing.JDialog {
         btnHuyBoTheLoai.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/ebooks/Icon/circle-cross.png"))); // NOI18N
         btnHuyBoTheLoai.setText("Hủy bỏ");
         btnHuyBoTheLoai.setBoderColor(new java.awt.Color(255, 102, 102));
+        btnHuyBoTheLoai.setEnabled(false);
         btnHuyBoTheLoai.setFont(new java.awt.Font("Inter Medium", 0, 14)); // NOI18N
         btnHuyBoTheLoai.setRadius(10);
         btnHuyBoTheLoai.addActionListener(new java.awt.event.ActionListener() {
@@ -287,6 +334,7 @@ public class AddTypeAndAuthorDiaLog extends javax.swing.JDialog {
         btnHuyBoTacGia.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/ebooks/Icon/circle-cross.png"))); // NOI18N
         btnHuyBoTacGia.setText("Hủy bỏ");
         btnHuyBoTacGia.setBoderColor(new java.awt.Color(255, 102, 102));
+        btnHuyBoTacGia.setEnabled(false);
         btnHuyBoTacGia.setFont(new java.awt.Font("Inter Medium", 0, 14)); // NOI18N
         btnHuyBoTacGia.setRadius(10);
         btnHuyBoTacGia.addActionListener(new java.awt.event.ActionListener() {
@@ -311,126 +359,193 @@ public class AddTypeAndAuthorDiaLog extends javax.swing.JDialog {
 
         pnlAddInfo.add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(400, 590, -1, 10));
 
+        txtTenSach.setEditable(false);
         txtTenSach.setBackground(new java.awt.Color(222, 247, 227));
-        txtTenSach.addKeyListener(new java.awt.event.KeyAdapter() {
-            public void keyPressed(java.awt.event.KeyEvent evt) {
-                txtTenSachKeyPressed(evt);
-            }
-        });
         pnlAddInfo.add(txtTenSach, new org.netbeans.lib.awtextra.AbsoluteConstraints(590, 50, 260, 40));
 
         jScrollPane1.setViewportView(pnlAddInfo);
 
         pnlTypeAndAuthor.add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 80, 910, 440));
 
+        jButton1.setText("jButton1");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
+        pnlTypeAndAuthor.add(jButton1, new org.netbeans.lib.awtextra.AbsoluteConstraints(340, 40, -1, -1));
+
+        pnlExit2.setBackground(new java.awt.Color(253, 127, 127));
+        pnlExit2.setRoundBottomLeft(20);
+        pnlExit2.setRoundTopRight(20);
+        pnlExit2.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                pnlExit2MouseClicked(evt);
+            }
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                pnlExit2MouseEntered(evt);
+            }
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                pnlExit2MouseExited(evt);
+            }
+        });
+        pnlExit2.setLayout(new java.awt.GridBagLayout());
+
+        lblExit2.setFont(new java.awt.Font("Inter", 1, 14)); // NOI18N
+        lblExit2.setForeground(new java.awt.Color(255, 255, 255));
+        lblExit2.setText("X");
+        lblExit2.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                lblExit2MouseClicked(evt);
+            }
+        });
+        pnlExit2.add(lblExit2, new java.awt.GridBagConstraints());
+
+        pnlTypeAndAuthor.add(pnlExit2, new org.netbeans.lib.awtextra.AbsoluteConstraints(860, 0, 50, 50));
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 910, Short.MAX_VALUE)
-            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                .addGroup(layout.createSequentialGroup()
-                    .addGap(0, 0, Short.MAX_VALUE)
-                    .addComponent(pnlTypeAndAuthor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addGap(0, 0, Short.MAX_VALUE)))
+            .addComponent(pnlTypeAndAuthor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 550, Short.MAX_VALUE)
-            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                .addGroup(layout.createSequentialGroup()
-                    .addGap(0, 0, Short.MAX_VALUE)
-                    .addComponent(pnlTypeAndAuthor, javax.swing.GroupLayout.PREFERRED_SIZE, 550, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addGap(0, 0, Short.MAX_VALUE)))
+            .addGroup(layout.createSequentialGroup()
+                .addComponent(pnlTypeAndAuthor, javax.swing.GroupLayout.PREFERRED_SIZE, 550, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 12, Short.MAX_VALUE))
         );
 
         pack();
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
-    private void lblExit1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lblExit1MouseClicked
-        // TODO add your handling code here:
-    }//GEN-LAST:event_lblExit1MouseClicked
-
-    private void lblExit1MousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lblExit1MousePressed
-        // TODO add your handling code here:
-        this.dispose();
-    }//GEN-LAST:event_lblExit1MousePressed
-
-    private void pnlExit1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_pnlExit1MouseClicked
-        // TODO add your handling code here:
-    }//GEN-LAST:event_pnlExit1MouseClicked
-
-    private void pnlExit1MouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_pnlExit1MouseEntered
-        // TODO add your handling code here:
-    }//GEN-LAST:event_pnlExit1MouseEntered
-
-    private void pnlExit1MouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_pnlExit1MouseExited
-        // TODO add your handling code here:
-    }//GEN-LAST:event_pnlExit1MouseExited
-
-    private void pnlExit1MousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_pnlExit1MousePressed
-        // TODO add your handling code here:
-        this.dispose();
-    }//GEN-LAST:event_pnlExit1MousePressed
-
     private void btnChonSachActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnChonSachActionPerformed
         new ListBookDiaLog(this, true).setVisible(true);
         setFormSach(sachSeletion);
+        fillTableTypeAndBook();
+        fillTableAuthorAndBook();
+        return;
     }//GEN-LAST:event_btnChonSachActionPerformed
 
-    private void lblSachImgMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lblSachImgMousePressed
-        if (evt.getClickCount() == 2) {
+    private void btnHuyBoTheLoaiActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnHuyBoTheLoaiActionPerformed
+        int index = tblTheLoai.getSelectedRow();
+        if (index != -1) {
+            String maTheLoai = String.valueOf(tblTheLoai.getValueAt(index, 0));
             try {
+                boolean result = DialogHelper.confirm(this, "Bạn muốn hủy thể loại này ra khổi sách");
+                if (result) {
+                    DAOTL_S.delete(new TheLoai_Sach(maTheLoai, txtMaSach.getText()));
+                    DialogHelper.alert(this, "Hủy thành công");
+                    fillTableTypeAndBook();
+                    btnHuyBoTheLoai.setEnabled(false);
+                    return;
+                }
 
             } catch (Exception e) {
-                //               DialogHelper.alert(this,"Lỗi Chọn Hình");
+                e.printStackTrace();
             }
+        } else {
+            DialogHelper.alert(this, "Hãy chọn thể loại muốn xóa!");
         }
-    }//GEN-LAST:event_lblSachImgMousePressed
 
-    private void lblSachImgMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lblSachImgMouseExited
-
-    }//GEN-LAST:event_lblSachImgMouseExited
-
-    private void lblSachImgMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lblSachImgMouseEntered
-
-    }//GEN-LAST:event_lblSachImgMouseEntered
-
-    private void txtNhaXuatBanKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtNhaXuatBanKeyPressed
-        if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
-
-        }
-    }//GEN-LAST:event_txtNhaXuatBanKeyPressed
-
-    private void txtMaSachKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtMaSachKeyPressed
-        if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
-
-        }
-    }//GEN-LAST:event_txtMaSachKeyPressed
-
-    private void btnHuyBoTheLoaiActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnHuyBoTheLoaiActionPerformed
-        // TODO add your handling code here:
     }//GEN-LAST:event_btnHuyBoTheLoaiActionPerformed
 
     private void btnThemTheLoaiActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnThemTheLoaiActionPerformed
         new ListTypeBookDiaLog(this, true).setVisible(true);
-        if(theLoaiSeletion != null){
-            
+        if (theLoaiSeletion != null) {
+            try {
+                TheLoai_Sach loai_Sach = new TheLoai_Sach();
+                loai_Sach.setMaSach(txtMaSach.getText());
+                loai_Sach.setMaTheLoai(theLoaiSeletion.getMaTheLoai());
+                DAOTL_S.insert(loai_Sach);
+                DialogHelper.alert(this, "Thêm thể loại thành công");
+                fillTableTypeAndBook();
+                theLoaiSeletion = null;
+                return;
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
         }
     }//GEN-LAST:event_btnThemTheLoaiActionPerformed
 
     private void btnThemTacGiaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnThemTacGiaActionPerformed
         new ListAuthorDiaLog(this, true).setVisible(true);
+        if (tacGiaSeletion != null) {
+            try {
+                TacGia_Sach tacGia_Sach = new TacGia_Sach();
+                tacGia_Sach.setMaSach(txtMaSach.getText());
+                tacGia_Sach.setMaTacGia(tacGiaSeletion.getMaTacGia());
+                DAOTG_S.insert(tacGia_Sach);
+                DialogHelper.alert(this, "Thêm tác giả thành công");
+                fillTableAuthorAndBook();
+                tacGiaSeletion = null;
+                return;
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+        }
     }//GEN-LAST:event_btnThemTacGiaActionPerformed
 
     private void btnHuyBoTacGiaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnHuyBoTacGiaActionPerformed
-        // TODO add your handling code here:
+        int index = tblTacGia.getSelectedRow();
+        if (index != -1) {
+            String maTacGia = String.valueOf(tblTacGia.getValueAt(index, 0));
+            try {
+                boolean result = DialogHelper.confirm(this, "Bạn muốn hủy tác giả này ra khỏi sách");
+                if (result) {
+                    DAOTG_S.delete(new TacGia_Sach(maTacGia, txtMaSach.getText()));
+                    DialogHelper.alert(this, "Hủy thành công");
+                    fillTableAuthorAndBook();
+                    btnHuyBoTacGia.setEnabled(false);
+                    return;
+                }
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        } else {
+            DialogHelper.alert(this, "Hãy chọn thể loại muốn xóa!");
+        }
     }//GEN-LAST:event_btnHuyBoTacGiaActionPerformed
 
-    private void txtTenSachKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtTenSachKeyPressed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_txtTenSachKeyPressed
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        System.exit(0);
+    }//GEN-LAST:event_jButton1ActionPerformed
+
+    private void tblTheLoaiMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblTheLoaiMouseClicked
+        btnHuyBoTheLoai.setEnabled(true);
+    }//GEN-LAST:event_tblTheLoaiMouseClicked
+
+    private void tblTacGiaMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblTacGiaMouseClicked
+        btnHuyBoTheLoai.setEnabled(true);
+    }//GEN-LAST:event_tblTacGiaMouseClicked
+
+    private void lblExit2MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lblExit2MouseClicked
+        this.dispose();
+    }//GEN-LAST:event_lblExit2MouseClicked
+
+    private void pnlExit2MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_pnlExit2MouseClicked
+        this.dispose();
+    }//GEN-LAST:event_pnlExit2MouseClicked
+
+    private void pnlExit2MouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_pnlExit2MouseEntered
+        pnlExit2.setBackground(new Color(255, 102, 102));
+    }//GEN-LAST:event_pnlExit2MouseEntered
+
+    private void pnlExit2MouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_pnlExit2MouseExited
+        pnlExit2.setBackground(new Color(253, 127, 127));
+    }//GEN-LAST:event_pnlExit2MouseExited
+
+    private void tblTheLoaiPropertyChange(java.beans.PropertyChangeEvent evt) {//GEN-FIRST:event_tblTheLoaiPropertyChange
+        fillTableTypeAndBook();
+    }//GEN-LAST:event_tblTheLoaiPropertyChange
+
+    private void tblTacGiaPropertyChange(java.beans.PropertyChangeEvent evt) {//GEN-FIRST:event_tblTacGiaPropertyChange
+      fillTableAuthorAndBook();
+    }//GEN-LAST:event_tblTacGiaPropertyChange
 
     /**
      * @param args the command line arguments
@@ -480,13 +595,14 @@ public class AddTypeAndAuthorDiaLog extends javax.swing.JDialog {
     private com.ebooks.Compoment.MyButton btnHuyBoTheLoai;
     private com.ebooks.Compoment.MyButton btnThemTacGia;
     private com.ebooks.Compoment.MyButton btnThemTheLoai;
+    private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
-    private javax.swing.JLabel lblExit1;
+    private javax.swing.JLabel lblExit2;
     private javax.swing.JLabel lblMaSach;
     private com.ebooks.Compoment.ImageBoder lblSachImg;
     private javax.swing.JLabel lblTenSach1;
@@ -494,7 +610,7 @@ public class AddTypeAndAuthorDiaLog extends javax.swing.JDialog {
     private javax.swing.JLabel lblTenSach3;
     private javax.swing.JLabel lblTenSach4;
     private com.ebooks.Compoment.PanelRound pnlAddInfo;
-    private com.ebooks.Compoment.PanelRound pnlExit1;
+    private com.ebooks.Compoment.PanelRound pnlExit2;
     private com.ebooks.Compoment.PanelRound pnlTypeAndAuthor;
     private com.ebooks.Compoment.Table tblTacGia;
     private com.ebooks.Compoment.Table tblTheLoai;

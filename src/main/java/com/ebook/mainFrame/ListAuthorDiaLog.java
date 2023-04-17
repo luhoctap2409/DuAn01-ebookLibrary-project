@@ -3,8 +3,19 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JDialog.java to edit this template
  */
 package com.ebook.mainFrame;
+
+import com.ebooks.dao.TacGiaDAO;
+import com.ebooks.dao.TheLoaiDAO;
+import com.ebooks.helper.DialogHelper;
 import com.ebooks.helper.MovingForm;
+import com.ebooks.helper.ShareHelper;
+import com.ebooks.model.TacGia;
+import com.ebooks.model.TheLoai;
 import java.awt.Color;
+import java.awt.event.KeyEvent;
+import java.util.ArrayList;
+import java.util.List;
+import javax.swing.table.DefaultTableModel;
 
 /**
  *
@@ -12,14 +23,34 @@ import java.awt.Color;
  */
 public class ListAuthorDiaLog extends javax.swing.JDialog {
 
-    /**
-     * Creates new form ListAuthorDiaLog
-     */
+    private List<TacGia> ListTG = new ArrayList<TacGia>();
+    private TacGiaDAO DAOTG = new TacGiaDAO();
+
     public ListAuthorDiaLog(java.awt.Dialog parent, boolean modal) {
         super(parent, modal);
         initComponents();
         setBackground(new Color(0, 0, 0, 0));
-        MovingForm.initMoving(this,pnlDanhSachTacGia);
+        MovingForm.initMoving(this, pnlDanhSachTacGia);
+        fillTableAuthorBook();
+    }
+
+    private void fillTableAuthorBook() {
+        List<TacGia> ListTL = new ArrayList<TacGia>();
+        TacGiaDAO DAOTG = new TacGiaDAO();
+        DefaultTableModel model;
+        model = (DefaultTableModel) tblTacGia.getModel();
+        tblTacGia.setSelectionBackground(new Color(87, 190, 110));
+        model.setRowCount(0);
+        try {
+            ListTL = DAOTG.selectNotBook(AddTypeAndAuthorDiaLog.sachSeletion.getMaSach(), txtTimTacGia.getText());
+            for (TacGia tacGia : ListTL) {
+                Object[] row = {tacGia.getMaTacGia(), tacGia.getHoTen(), ShareHelper.formats.format(tacGia.getNgaySinh()), tacGia.isGioiTinh(), tacGia.getMoTa()};
+                model.addRow(row);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            DialogHelper.alert(this, "Lỗi truy vấn dữ liệu");
+        }
     }
 
     /**
@@ -35,7 +66,7 @@ public class ListAuthorDiaLog extends javax.swing.JDialog {
         pnlExit1 = new com.ebooks.Compoment.PanelRound();
         lblExit1 = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
-        table1 = new com.ebooks.Compoment.Table();
+        tblTacGia = new com.ebooks.Compoment.Table();
         jLabel19 = new javax.swing.JLabel();
         panelRound4 = new com.ebooks.Compoment.PanelRound();
         txtTimTacGia = new com.ebooks.Compoment.SearchText();
@@ -86,7 +117,7 @@ public class ListAuthorDiaLog extends javax.swing.JDialog {
 
         pnlDanhSachTacGia.add(pnlExit1, new org.netbeans.lib.awtextra.AbsoluteConstraints(680, 0, 50, 50));
 
-        table1.setModel(new javax.swing.table.DefaultTableModel(
+        tblTacGia.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null},
                 {null, null, null, null},
@@ -96,8 +127,21 @@ public class ListAuthorDiaLog extends javax.swing.JDialog {
             new String [] {
                 "Title 1", "Title 2", "Title 3", "Title 4"
             }
-        ));
-        jScrollPane1.setViewportView(table1);
+        ) {
+            boolean[] canEdit = new boolean [] {
+                false, false, false, false
+            };
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        });
+        tblTacGia.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                tblTacGiaMouseClicked(evt);
+            }
+        });
+        jScrollPane1.setViewportView(tblTacGia);
 
         pnlDanhSachTacGia.add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 130, 690, 280));
 
@@ -115,8 +159,12 @@ public class ListAuthorDiaLog extends javax.swing.JDialog {
 
         txtTimTacGia.setBackground(new java.awt.Color(232, 244, 234));
         txtTimTacGia.setForeground(new java.awt.Color(51, 51, 51));
-        txtTimTacGia.setText("Tìm kiếm tác giả ");
         txtTimTacGia.setFont(new java.awt.Font("Inter Medium", 0, 12)); // NOI18N
+        txtTimTacGia.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                txtTimTacGiaKeyPressed(evt);
+            }
+        });
         panelRound4.add(txtTimTacGia, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 0, 630, 40));
 
         btnTimTacGia.setBackground(new java.awt.Color(232, 244, 234));
@@ -197,12 +245,40 @@ public class ListAuthorDiaLog extends javax.swing.JDialog {
     }//GEN-LAST:event_pnlExit1MousePressed
 
     private void btnTimTacGiaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnTimTacGiaActionPerformed
-        // TODO add your handling code here:
+        fillTableAuthorBook();
     }//GEN-LAST:event_btnTimTacGiaActionPerformed
 
     private void btnLuuThongTinActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLuuThongTinActionPerformed
-       
+        int index = tblTacGia.getSelectedRow();
+        if (index != -1) {
+            String maTheLoai = String.valueOf(tblTacGia.getValueAt(index, 0));
+            TacGia tacGia = DAOTG.findById(maTheLoai);
+            if (tacGia != null) {
+                AddTypeAndAuthorDiaLog.tacGiaSeletion = tacGia;
+                this.dispose();
+            }
+        } else {
+            DialogHelper.alert(this, "Hãy chọn tác giả !");
+        }
     }//GEN-LAST:event_btnLuuThongTinActionPerformed
+
+    private void txtTimTacGiaKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtTimTacGiaKeyPressed
+        if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
+            fillTableAuthorBook();
+        }
+    }//GEN-LAST:event_txtTimTacGiaKeyPressed
+
+    private void tblTacGiaMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblTacGiaMouseClicked
+        if (evt.getClickCount() == 2) {
+            int index = tblTacGia.getSelectedRow();
+            String maTheLoai = String.valueOf(tblTacGia.getValueAt(index, 0));
+            TacGia tacGia = DAOTG.findById(maTheLoai);
+            if (tacGia != null) {
+                AddTypeAndAuthorDiaLog.tacGiaSeletion = tacGia;
+                this.dispose();
+            }
+        }
+    }//GEN-LAST:event_tblTacGiaMouseClicked
 
     /**
      * @param args the command line arguments
@@ -255,7 +331,7 @@ public class ListAuthorDiaLog extends javax.swing.JDialog {
     private com.ebooks.Compoment.PanelRound panelRound4;
     private com.ebooks.Compoment.PanelRound pnlDanhSachTacGia;
     private com.ebooks.Compoment.PanelRound pnlExit1;
-    private com.ebooks.Compoment.Table table1;
+    private com.ebooks.Compoment.Table tblTacGia;
     private com.ebooks.Compoment.SearchText txtTimTacGia;
     // End of variables declaration//GEN-END:variables
 }
