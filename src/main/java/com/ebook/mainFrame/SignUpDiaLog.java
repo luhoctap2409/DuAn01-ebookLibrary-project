@@ -40,6 +40,10 @@ public class SignUpDiaLog extends javax.swing.JDialog {
         setBackground(new Color(0, 0, 0, 0));
         MovingForm.initMoving(this, pnlMainDialog);
     }
+    
+    public SignUpDiaLog() {
+        
+    }
 
     private boolean checkForm() {
         if (!UtilityHelper.checkNullText(lblTenDangNhap, txtTenDangNhap)) {

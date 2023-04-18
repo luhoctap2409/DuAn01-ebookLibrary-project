@@ -35,6 +35,10 @@ public class PublishingCompanyDiaLog extends javax.swing.JDialog {
         txtMaNhaXuatBan.setEditable(false);
         statusButton(false);
     }
+    
+    public PublishingCompanyDiaLog() {
+        
+    }
 
     private void fillTablePublishingCompany() {
         DefaultTableModel model;
@@ -110,6 +114,27 @@ public class PublishingCompanyDiaLog extends javax.swing.JDialog {
             DialogHelper.alert(this, "Thêm mới thất bại");
             e.printStackTrace();
         }
+    }
+    
+    //test tạo nhà xuất bản
+    public String testCreateNXB(NhaXuatBan nxb) {
+    	String nofitication = "";
+    	if (!nxb.getTenNXB().equals("")) {
+    		try {
+                DAONXB.insert(nxb);
+                nofitication = "Thêm mới thành công";
+                return nofitication;
+            } catch (Exception e) {
+            	nofitication = "Thêm mới thất bại";
+                e.printStackTrace();
+                return nofitication;
+            }
+        }
+    	else {
+    		nofitication = "Không được để trống Tên Nhà xuất bản";
+    		return nofitication;
+    	}
+        
     }
 
     private void UpadateNXB() {

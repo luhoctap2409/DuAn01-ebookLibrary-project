@@ -44,6 +44,10 @@ public class AccoutAdmainDiaLog extends javax.swing.JDialog {
         txtTenDangNhap.setEditable(false);
         fillTableTaiKhoan();
     }
+    
+    public AccoutAdmainDiaLog() {
+        
+    }
 
     private void fillTableTaiKhoan() {
         DefaultTableModel model;
@@ -128,6 +132,20 @@ public class AccoutAdmainDiaLog extends javax.swing.JDialog {
         }
 
     }
+    
+    //test Chỉnh sửa tài khoản
+    public String testUptateTaiKhoan(TaiKhoan taiKhoan) {
+    	String notification = "";
+        try {
+            DAOTK.update(taiKhoan);
+            notification = "Lưu thông tin thành công";
+            return notification;
+        } catch (Exception e) {
+           notification = "Lưu thông tin thất bại";
+            return notification;
+        }
+
+    }
 
     private void DeleteTaiKhoan() {
         if (!rdoQuanTriVien.isSelected()) {
@@ -146,6 +164,34 @@ public class AccoutAdmainDiaLog extends javax.swing.JDialog {
         } else {
             DialogHelper.alert(this, "Tài khoản muốn xóa đang là quản trị viên !");
             return;
+        }
+    }
+    
+    //test xóa account
+    public String testDeleteTaiKhoan(String username) {
+    	String nofitication = "";
+    	TaiKhoan taiKhoan = DAOTK.findById(username);
+    	boolean role = taiKhoan.isVaiTro();
+        if (!role) {
+            try {
+                boolean result = DialogHelper.confirm(this, "Bạn có chắc muốn xóa !");
+                if (result) {
+                    DAOMS.deleteND(username);
+                    DAOTTND.deleteND(username);
+                    DAOTK.delete(username);
+                    nofitication = "Xóa thành công";
+                    return nofitication;
+                }
+                else {
+                	return "";
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                return nofitication;
+            }
+        } else {
+        	nofitication = "Tài khoản muốn xóa đang là quản trị viên !";
+            return nofitication;
         }
     }
 
